@@ -1,0 +1,248 @@
+import { writeFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const offers = [
+  {
+    id: 1,
+    version: 2,
+    created_at: '2025-11-15T10:00:00.000Z',
+    updated_at: '2025-12-01T14:30:00.000Z',
+    created_by: 'admin@nova.com',
+    parent_offer_id: null,
+    offer_config: {
+      offer_id: 'OFFER-001-DINE3X',
+      title: 'Dine 3x to receive 500 points',
+      template_type: 'single_dine',
+      partner_ids: ['partner_1', 'partner_3'],
+      is_sequenced: false,
+      actions: [
+        {
+          action_type: 'dine_visit',
+          metric: 'count',
+          metric_value: 3,
+          merchant_scope: { mode: 'global' },
+          time_constraint_days: '',
+        },
+      ],
+      frequency_window: 'one_time',
+      max_redemptions: 1,
+      reward: {
+        reward_type: 'flat',
+        reward_value: 500,
+        reward_unit: '',
+        reward_currency: 'partner_currency',
+        partner_currency_name: 'points',
+      },
+      audience_targeting: {
+        states: [],
+        regions: [],
+        neighborhoods: [],
+        zip_code_proximity: null,
+        partner_tiers: ['gold', 'platinum'],
+        rn_tiers: [],
+        min_lifetime_transactions: '',
+        segments: ['new_member'],
+      },
+      merchant_selection: {
+        mode: 'all',
+        cuisines: [],
+        merchant_ids: [],
+        excluded_merchant_ids: [],
+      },
+      timing_rules: {
+        start_date: '2026-01-01T00:00:00.000Z',
+        end_date: '2026-03-31T23:59:59.000Z',
+        day_of_week: [],
+      },
+      chaining: { preceded_by: '', succeeded_by: '' },
+      event_triggers: ['member_enrollment'],
+      marketing_legal: {
+        terms_and_conditions: 'Must complete 3 qualifying dine-in visits within the offer period.',
+        marketing_content_reference: 'MKTG-2026-Q1-001',
+        offer_description_internal: 'New member incentive — dine 3x for 500 bonus points.',
+        offer_description_external: 'Dine at any participating restaurant 3 times and earn 500 bonus points!',
+        offer_group_id: 'GRP-NEW-MEMBER-Q1',
+      },
+    },
+  },
+  {
+    id: 2,
+    version: 1,
+    created_at: '2025-12-10T09:00:00.000Z',
+    updated_at: '2025-12-10T09:00:00.000Z',
+    created_by: 'marketing@nova.com',
+    parent_offer_id: null,
+    offer_config: {
+      offer_id: 'OFFER-002-SPEND25',
+      title: 'Spend $25+ at any Italian restaurant, earn $5 cashback',
+      template_type: 'single_dine_spend',
+      partner_ids: ['partner_1', 'partner_2', 'partner_5'],
+      is_sequenced: false,
+      actions: [
+        {
+          action_type: 'spend',
+          metric: 'amount',
+          metric_value: 25,
+          merchant_scope: { mode: 'cuisine', cuisines: ['italian'] },
+          time_constraint_days: '',
+        },
+      ],
+      frequency_window: 'weekly',
+      max_redemptions: 4,
+      reward: {
+        reward_type: 'flat',
+        reward_value: 5,
+        reward_unit: '',
+        reward_currency: 'cashback',
+        partner_currency_name: '',
+      },
+      audience_targeting: {
+        states: ['NY', 'NJ', 'CT'],
+        regions: ['tri-state'],
+        neighborhoods: [],
+        zip_code_proximity: null,
+        partner_tiers: [],
+        rn_tiers: [],
+        min_lifetime_transactions: 3,
+        segments: [],
+      },
+      merchant_selection: {
+        mode: 'cuisine',
+        cuisines: ['italian'],
+        merchant_ids: [],
+        excluded_merchant_ids: [],
+      },
+      timing_rules: {
+        start_date: '2026-02-01T00:00:00.000Z',
+        end_date: '2026-04-30T23:59:59.000Z',
+        day_of_week: ['friday', 'saturday', 'sunday'],
+      },
+      chaining: { preceded_by: '', succeeded_by: '' },
+      event_triggers: [],
+      marketing_legal: {
+        terms_and_conditions: 'Minimum $25 spend required. Cashback credited within 48 hours.',
+        marketing_content_reference: '',
+        offer_description_internal: 'Weekend Italian dining cashback promo for tri-state area.',
+        offer_description_external: 'Enjoy Italian this weekend — spend $25+ and get $5 cashback!',
+        offer_group_id: 'GRP-CUISINE-ITALIAN',
+      },
+    },
+  },
+  {
+    id: 3,
+    version: 1,
+    created_at: '2026-01-05T16:00:00.000Z',
+    updated_at: '2026-01-05T16:00:00.000Z',
+    created_by: 'admin@nova.com',
+    parent_offer_id: null,
+    offer_config: {
+      offer_id: 'OFFER-003-2ACTION',
+      title: 'Link card + Dine to earn 1000 points',
+      template_type: 'two_action',
+      partner_ids: ['partner_1'],
+      is_sequenced: true,
+      actions: [
+        {
+          action_type: 'card_linked',
+          metric: 'count',
+          metric_value: 1,
+          merchant_scope: { mode: 'global' },
+          time_constraint_days: '',
+        },
+        {
+          action_type: 'dine_visit',
+          metric: 'count',
+          metric_value: 1,
+          merchant_scope: { mode: 'any' },
+          time_constraint_days: 30,
+        },
+      ],
+      frequency_window: 'one_time',
+      max_redemptions: 1,
+      reward: {
+        reward_type: 'flat',
+        reward_value: 1000,
+        reward_unit: '',
+        reward_currency: 'partner_currency',
+        partner_currency_name: 'points',
+      },
+      audience_targeting: {
+        states: [],
+        regions: [],
+        neighborhoods: [],
+        zip_code_proximity: null,
+        partner_tiers: [],
+        rn_tiers: [],
+        min_lifetime_transactions: '',
+        segments: ['new_member'],
+      },
+      merchant_selection: {
+        mode: 'all',
+        cuisines: [],
+        merchant_ids: [],
+        excluded_merchant_ids: [],
+      },
+      timing_rules: {
+        start_date: '2026-02-01T00:00:00.000Z',
+        end_date: '2026-12-31T23:59:59.000Z',
+        day_of_week: [],
+      },
+      chaining: { preceded_by: '', succeeded_by: '' },
+      event_triggers: ['card_linked'],
+      marketing_legal: {
+        terms_and_conditions: 'Link a qualifying card then complete 1 dine-in visit within 30 days.',
+        marketing_content_reference: 'MKTG-2026-CARD',
+        offer_description_internal: 'Card link activation offer — 2 step sequenced.',
+        offer_description_external: 'Link your card and dine to earn 1000 bonus points!',
+        offer_group_id: 'GRP-CARD-ACTIVATION',
+      },
+    },
+  },
+];
+
+const offer_versions = [
+  {
+    id: 1,
+    offer_id: 1,
+    version: 1,
+    offer_config_snapshot: { ...offers[0].offer_config, title: 'Dine 3x for points' },
+    saved_at: '2025-11-15T10:00:00.000Z',
+    saved_by: 'admin@nova.com',
+    change_summary: 'Initial creation',
+  },
+  {
+    id: 2,
+    offer_id: 1,
+    version: 2,
+    offer_config_snapshot: offers[0].offer_config,
+    saved_at: '2025-12-01T14:30:00.000Z',
+    saved_by: 'admin@nova.com',
+    change_summary: 'Updated title, added partner tiers targeting',
+  },
+  {
+    id: 3,
+    offer_id: 2,
+    version: 1,
+    offer_config_snapshot: offers[1].offer_config,
+    saved_at: '2025-12-10T09:00:00.000Z',
+    saved_by: 'marketing@nova.com',
+    change_summary: 'Initial creation',
+  },
+  {
+    id: 4,
+    offer_id: 3,
+    version: 1,
+    offer_config_snapshot: offers[2].offer_config,
+    saved_at: '2026-01-05T16:00:00.000Z',
+    saved_by: 'admin@nova.com',
+    change_summary: 'Initial creation',
+  },
+];
+
+const db = { offers, offer_versions };
+
+writeFileSync(join(__dirname, 'db.json'), JSON.stringify(db, null, 2));
+console.log('Database seeded with', offers.length, 'offers and', offer_versions.length, 'version entries.');
