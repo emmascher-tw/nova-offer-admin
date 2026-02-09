@@ -249,15 +249,6 @@ Array of event types that trigger automatic assignment of this offer to a user.
 
 ---
 
-## Sample Data
-
-See [`src/api/seedData.js`](../src/api/seedData.js) for 3 fully populated example offers:
-
-1. **Single Dine** — "Dine 3x to receive 500 points" (1 action, partner currency, new member segment)
-2. **Dine Spend** — "Spend $25+ at any Italian restaurant, earn $5 cashback" (1 action, cashback, cuisine-based merchant selection, geo targeting)
-3. **2-Action Sequenced** — "Link card + Dine to earn 1000 points" (2 sequenced actions, event trigger, time constraint)
-
----
 
 ## Templates
 
