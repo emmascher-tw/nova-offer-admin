@@ -1,4 +1,4 @@
-export function buildOfferPayload(formData, { isEdit = false, currentVersion = 0 } = {}) {
+export function buildOfferPayload(formData, { isEdit = false, currentVersion = 0, templateId = null } = {}) {
   const now = new Date().toISOString();
   const payload = {
     offer_config: formData,
@@ -6,6 +6,8 @@ export function buildOfferPayload(formData, { isEdit = false, currentVersion = 0
   };
   if (!isEdit) {
     payload.version = 1;
+    payload.status = 'DRAFT';
+    payload.template_id = templateId;
     payload.created_at = now;
     payload.created_by = 'admin@nova.com';
     payload.parent_offer_id = null;

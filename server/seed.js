@@ -4,10 +4,69 @@ import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const offer_templates = [
+  {
+    id: 1, key: 'single_dine', name: 'Single Dine', category: 'Dine-Based',
+    description: 'Dine Y times to receive X reward — specific or cross-merchant, with optional trigger',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 2, key: 'single_dine_spend', name: 'Single Dine Spend', category: 'Dine-Based',
+    description: 'Spend at least $Y to receive X reward — specific or cross-merchant',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 3, key: 'single_spend', name: 'Single Spend', category: 'Spend-Based',
+    description: 'Spend $Y at a specific restaurant and earn X reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 4, key: 'spend_across_dines', name: 'Spend Across Dines', category: 'Spend-Based',
+    description: 'Spend at least $Y across multiple dines to receive X reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 5, key: 'frequency_time', name: 'Frequency (Time-Based)', category: 'Frequency',
+    description: 'Dine Y times in the next Z days to receive X reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 6, key: 'frequency_recurring', name: 'Frequency (Recurring)', category: 'Frequency',
+    description: 'Go to restaurant(s) Y times per week/month, earn X reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 7, key: 'single_activity', name: 'Single Activity', category: 'Activity',
+    description: 'Complete a single action (review, card link, subscribe, etc.) and earn a reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 8, key: 'two_action', name: '2-Action Template', category: 'Multi-Action',
+    description: 'Take action 1 THEN action 2 to earn Y reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+  {
+    id: 9, key: 'three_action', name: '3-Action Template', category: 'Multi-Action',
+    description: 'Take action 1 THEN action 2 THEN action 3 to earn Y reward',
+    version: 1, status: 'active',
+    created_at: '2025-10-01T00:00:00.000Z', updated_at: '2025-10-01T00:00:00.000Z', created_by: 'system@nova.com',
+  },
+];
+
 const offers = [
   {
     id: 1,
     version: 2,
+    status: 'ACTIVE',
+    template_id: 1,
     created_at: '2025-11-15T10:00:00.000Z',
     updated_at: '2025-12-01T14:30:00.000Z',
     created_by: 'admin@nova.com',
@@ -71,6 +130,8 @@ const offers = [
   {
     id: 2,
     version: 1,
+    status: 'PENDING_REVIEW',
+    template_id: 2,
     created_at: '2025-12-10T09:00:00.000Z',
     updated_at: '2025-12-10T09:00:00.000Z',
     created_by: 'marketing@nova.com',
@@ -134,6 +195,8 @@ const offers = [
   {
     id: 3,
     version: 1,
+    status: 'DRAFT',
+    template_id: 8,
     created_at: '2026-01-05T16:00:00.000Z',
     updated_at: '2026-01-05T16:00:00.000Z',
     created_by: 'admin@nova.com',
@@ -242,7 +305,12 @@ const offer_versions = [
   },
 ];
 
-const db = { offers, offer_versions };
+const db = { offer_templates, offers, offer_versions };
 
 writeFileSync(join(__dirname, 'db.json'), JSON.stringify(db, null, 2));
-console.log('Database seeded with', offers.length, 'offers and', offer_versions.length, 'version entries.');
+console.log(
+  'Database seeded with',
+  offer_templates.length, 'templates,',
+  offers.length, 'offers, and',
+  offer_versions.length, 'version entries.'
+);

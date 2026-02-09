@@ -1,3 +1,13 @@
+// ── Offer Statuses (lifecycle state machine) ──
+export const OFFER_STATUSES = [
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'PENDING_REVIEW', label: 'Pending Review' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'INACTIVE', label: 'Inactive' },
+];
+
+export const OFFER_STATUS_VALUES = OFFER_STATUSES.map((s) => s.value);
+
 export const PARTNERS = [
   { id: 'partner_1', name: 'Partner 1' },
   { id: 'partner_2', name: 'Partner 2' },

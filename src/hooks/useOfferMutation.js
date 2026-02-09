@@ -7,10 +7,10 @@ import { generateOfferId } from '../utils/generateOfferId.js';
 export default function useOfferMutation() {
   const [saving, setSaving] = useState(false);
 
-  const create = async (formData) => {
+  const create = async (formData, { templateId = null } = {}) => {
     setSaving(true);
     try {
-      const payload = buildOfferPayload(formData);
+      const payload = buildOfferPayload(formData, { templateId });
       const created = await createOffer(payload);
       await createVersion(buildVersionPayload(created.id, 1, formData));
       return created;
@@ -42,7 +42,7 @@ export default function useOfferMutation() {
     config.offer_id = generateOfferId();
     config.title = `Copy of ${config.title}`;
 
-    const payload = buildOfferPayload(config);
+    const payload = buildOfferPayload(config, { templateId: sourceOffer.template_id || null });
     payload.parent_offer_id = sourceOffer.id;
     const created = await createOffer(payload);
     await createVersion(buildVersionPayload(created.id, 1, config, 'Cloned from ' + sourceOffer.offer_config.offer_id));

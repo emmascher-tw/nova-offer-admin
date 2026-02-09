@@ -4,4 +4,5 @@ export {
   createOffer,
   updateOffer,
   deleteOffer,
+  transitionOfferStatus,
 } from './localStorage.js';

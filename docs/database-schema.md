@@ -1,8 +1,33 @@
 # Nova Offer Configuration — Database Schema
 
+> See also: [Entity Relationship Diagram](./erd.md)
+
 ## Overview
 
-Two tables store offer configurations and their version history. The `offer_config` column stores the full configuration as a JSON document.
+Three tables store offer templates, configurations, and their version history. The `offer_config` column stores the full configuration as a JSON document.
+
+---
+
+## Table 0: `offer_templates`
+
+Stores **admin-managed offer templates** with versioning. Templates define the default configuration and category for each offer type.
+
+| Column | Type | Nullable | Description |
+|---|---|---|---|
+| `id` | `SERIAL` / `INT AUTO_INCREMENT` | NOT NULL (PK) | Primary key |
+| `key` | `VARCHAR(100)` | NOT NULL (UNIQUE) | Machine-readable identifier (e.g., `single_dine`) — used for badge colors/labels |
+| `name` | `VARCHAR(200)` | NOT NULL | Display name (e.g., "Single Dine") |
+| `description` | `TEXT` | NULL | Human-readable description of this template |
+| `category` | `VARCHAR(100)` | NOT NULL | Template category: `Dine-Based`, `Spend-Based`, `Frequency`, `Activity`, `Multi-Action` |
+| `default_config` | `JSONB` / `JSON` | NOT NULL | Default `offer_config` values produced when this template is selected (minus `offer_id`) |
+| `validation_rules` | `JSONB` / `JSON` | NULL | Per-template validation constraints (future use) |
+| `version` | `INT` | NOT NULL | Template version number — increments when template defaults change |
+| `status` | `VARCHAR(20)` | NOT NULL | Template status: `active` or `deprecated` |
+| `created_at` | `TIMESTAMP` | NOT NULL | When the template was created |
+| `updated_at` | `TIMESTAMP` | NOT NULL | When the template was last modified |
+| `created_by` | `VARCHAR(255)` | NOT NULL | Email/ID of user who created it |
+
+**Template status** is simpler than offer status — only `active` (available for new offers) or `deprecated` (hidden from selection, existing offers unaffected).
 
 ---
 
@@ -15,10 +40,31 @@ Stores the **current state** of each offer.
 | `id` | `SERIAL` / `INT AUTO_INCREMENT` | NOT NULL (PK) | Primary key |
 | `offer_config` | `JSONB` / `JSON` | NOT NULL | Full offer configuration document (see schema below) |
 | `version` | `INT` | NOT NULL | Current version number — increments on each save |
+| `status` | `VARCHAR(20)` | NOT NULL | Offer lifecycle status: `DRAFT`, `PENDING_REVIEW`, `ACTIVE`, `INACTIVE` (default: `DRAFT`) |
+| `template_id` | `INT` | NULL | FK → `offer_templates.id` — which template was used to create this offer. NULL for offers built from scratch. Note: `template_type` string is retained in `offer_config` JSONB for display/backward compat |
 | `created_at` | `TIMESTAMP` | NOT NULL | When the offer was first created |
 | `updated_at` | `TIMESTAMP` | NOT NULL | When the offer was last modified |
 | `created_by` | `VARCHAR(255)` | NOT NULL | Email/ID of user who created it |
 | `parent_offer_id` | `INT` | NULL | FK → `offers.id` — set when offer was cloned from another |
+
+### Offer Status Lifecycle
+
+Offers follow a 4-state lifecycle:
+
+```
+DRAFT → PENDING_REVIEW → ACTIVE → INACTIVE
+  ↑                                    │
+  └────────────────────────────────────┘
+```
+
+| From | To | Gate |
+|---|---|---|
+| `DRAFT` | `PENDING_REVIEW` | Schema validation passes + business rules (title, partner, actions, dates required) |
+| `PENDING_REVIEW` | `ACTIVE` | Reviewer approval |
+| `ACTIVE` | `INACTIVE` | Any admin, any time |
+| `INACTIVE` | `DRAFT` | Returns to draft for re-editing |
+
+**Invalid transitions:** `DRAFT→ACTIVE` (cannot skip review), `ACTIVE→DRAFT` (must deactivate first).
 
 ---
 

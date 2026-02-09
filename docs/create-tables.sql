@@ -1,17 +1,43 @@
 -- ============================================================
 -- Nova Offer Configuration — Table Definitions
 -- ============================================================
--- Two tables: offers (current state) and offer_versions (audit trail).
+-- Three tables: offer_templates (admin-managed templates),
+-- offers (current state), and offer_versions (audit trail).
 -- The offer configuration itself is stored as a JSON document.
 -- Syntax below is PostgreSQL. For MySQL, replace JSONB with JSON
 -- and SERIAL with INT AUTO_INCREMENT.
 -- ============================================================
+
+-- Table 0: Admin-managed offer templates
+CREATE TABLE offer_templates (
+    id                SERIAL        PRIMARY KEY,
+    key               VARCHAR(100)  NOT NULL UNIQUE,           -- e.g. 'single_dine'
+    name              VARCHAR(200)  NOT NULL,
+    description       TEXT          NULL,
+    category          VARCHAR(100)  NOT NULL,                  -- 'Dine-Based', 'Spend-Based', etc.
+    default_config    JSONB         NOT NULL,                  -- Default offer_config produced by this template
+    validation_rules  JSONB         NULL,                      -- Per-template constraints (future use)
+    version           INT           NOT NULL DEFAULT 1,
+    status            VARCHAR(20)   NOT NULL DEFAULT 'active'
+                      CHECK (status IN ('active', 'deprecated')),
+    created_at        TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    created_by        VARCHAR(255)  NOT NULL
+);
+
+CREATE INDEX idx_templates_category ON offer_templates (category);
+CREATE INDEX idx_templates_status   ON offer_templates (status);
+CREATE INDEX idx_templates_key      ON offer_templates (key);
+
 
 -- Table 1: Current state of each offer
 CREATE TABLE offers (
     id                SERIAL        PRIMARY KEY,
     offer_config      JSONB         NOT NULL,       -- Full offer configuration document
     version           INT           NOT NULL DEFAULT 1,
+    status            VARCHAR(20)   NOT NULL DEFAULT 'DRAFT'
+                      CHECK (status IN ('DRAFT', 'PENDING_REVIEW', 'ACTIVE', 'INACTIVE')),
+    template_id       INT           NULL REFERENCES offer_templates(id) ON DELETE SET NULL,
     created_at        TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
     updated_at        TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
     created_by        VARCHAR(255)  NOT NULL,
@@ -21,6 +47,8 @@ CREATE TABLE offers (
 CREATE INDEX idx_offers_created_by    ON offers (created_by);
 CREATE INDEX idx_offers_updated_at    ON offers (updated_at DESC);
 CREATE INDEX idx_offers_parent        ON offers (parent_offer_id) WHERE parent_offer_id IS NOT NULL;
+CREATE INDEX idx_offers_status        ON offers (status);
+CREATE INDEX idx_offers_template      ON offers (template_id) WHERE template_id IS NOT NULL;
 
 -- GIN index for querying inside the JSON document
 CREATE INDEX idx_offers_config        ON offers USING GIN (offer_config);
