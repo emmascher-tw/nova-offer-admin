@@ -5,6 +5,8 @@
  * transition validation, and documented repository interfaces.
  */
 
+import { offerSchema } from '../schemas/offerSchema.js';
+
 // ── Data Contracts ──
 
 /**
@@ -103,27 +105,24 @@ export function validateTransition(offer, toStatus) {
   if (fromStatus === 'DRAFT' && toStatus === 'PENDING_REVIEW') {
     const config = offer.offer_config;
 
-    if (!config.title || !config.title.trim()) {
-      errors.push('Title is required');
+    // Schema validation (covers required fields, types, enums)
+    const parseResult = offerSchema.safeParse(config);
+    if (!parseResult.success) {
+      parseResult.error.issues.forEach((issue) => {
+        errors.push(`${issue.path.join('.')}: ${issue.message}`);
+      });
     }
 
-    if (!config.partner_ids || config.partner_ids.length === 0) {
-      errors.push('At least one partner must be selected');
+    // Business rules beyond schema
+    if (config.timing_rules?.start_date && config.timing_rules?.end_date) {
+      const start = new Date(config.timing_rules.start_date);
+      const end = new Date(config.timing_rules.end_date);
+      if (end <= start) {
+        errors.push('End date must be after start date');
+      }
     }
 
-    if (!config.actions || config.actions.length === 0) {
-      errors.push('At least one action is required');
-    }
-
-    if (!config.timing_rules?.start_date) {
-      errors.push('Start date is required');
-    }
-
-    if (!config.timing_rules?.end_date) {
-      errors.push('End date is required');
-    }
-
-    if (!config.reward?.reward_value || config.reward.reward_value <= 0) {
+    if (config.reward && config.reward.reward_value <= 0) {
       errors.push('Reward value must be greater than 0');
     }
   }
